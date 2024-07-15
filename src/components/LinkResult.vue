@@ -104,7 +104,9 @@ const fetchCommentaries = async () => {
   ]);
 
   translation.value = translationJson.versions[0]?.text;
-  commentaries.value = commentariesJson;
+  commentaries.value = commentariesJson.filter(
+    (link: Link) => link.category === "Commentary"
+  );
   loading.value = false;
 };
 
