@@ -61,7 +61,10 @@
           </h3>
           <p class="text-xs text-gray-600">{{ commentary.sourceHeRef }}</p>
         </a>
-        <p v-html="commentary.he" class="mt-3 text-lg/none font-siddur" />
+        <p
+          v-html="commentary.he"
+          class="mt-3 text-lg/none text-blue-900 font-siddur"
+        />
       </li>
     </ul>
   </li>
