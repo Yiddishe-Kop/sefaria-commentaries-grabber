@@ -32,7 +32,10 @@
       <h3 class="font-bold me-2">{{ link.collectiveTitle.he }}</h3>
       <p class="text-sm text-gray-600">{{ link.sourceHeRef }}</p>
     </a>
-    <p v-html="link.he" class="mt-4 text-2xl/none font-bold font-siddur" />
+    <p
+      v-html="shrinkParenthesis(link.he)"
+      class="mt-4 text-2xl/none font-bold font-siddur"
+    />
     <!-- <pre
       dir="ltr"
       class="text-xs p-4 overflow-auto whitespace-pre bg-gray-100"
@@ -44,7 +47,10 @@
         <div class="bg-white px-4 rounded-full border absolute -top-3 right-4">
           תרגום
         </div>
-        <p class="mt-3 text-2xl/none font-siddur">{{ translation }}</p>
+        <p
+          class="mt-3 text-2xl/none font-siddur"
+          v-html="shrinkParenthesis(translation)"
+        />
       </li>
       <li
         v-for="commentary in commentaries"
@@ -62,7 +68,7 @@
           <p class="text-xs text-gray-600">{{ commentary.sourceHeRef }}</p>
         </a>
         <p
-          v-html="commentary.he"
+          v-html="shrinkParenthesis(commentary.he)"
           class="mt-3 text-lg/none text-blue-900 font-siddur"
         />
       </li>
@@ -71,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import Loader from "./Loader.vue";
 
 const props = defineProps<{
@@ -84,6 +90,10 @@ defineEmits(["delete"]);
 const loading = ref(false);
 const translation = ref("");
 const commentaries = ref<Link[]>([]);
+
+const shrinkParenthesis = (text: string) => {
+  return text.replace(/(\(.+?\))/g, '<span class="mekor">$1</span>');
+};
 
 const fetchCommentaries = async () => {
   loading.value = true;
@@ -115,3 +125,10 @@ const fetchCommentaries = async () => {
 
 onMounted(fetchCommentaries);
 </script>
+
+<style>
+.mekor {
+  @apply text-gray-500 font-normal;
+  font-size: 0.8em;
+}
+</style>
