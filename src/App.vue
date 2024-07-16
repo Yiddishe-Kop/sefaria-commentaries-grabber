@@ -45,13 +45,24 @@
         </button>
       </nav>
       <ul id="results" class="space-y-8 mt-6">
-        <LinkResult
-          v-for="(link, i) in kabbalahLinks"
-          :key="link._id"
-          :index="i + 1"
-          :link="link"
-          @delete="links = links.filter((l) => l._id !== link._id)"
-        />
+        <template v-for="(link, i) in kabbalahLinks" :key="link._id">
+          <div
+            v-if="
+              i == 0 || link.anchorVerse != kabbalahLinks[i - 1].anchorVerse
+            "
+            class="bg-yellow-50 p-4 border border-yellow-300 font-siddur font-black text-3xl"
+          >
+            <span class="me-2 text-yellow-700 font-normal">
+              {{ arabicToHebrew(String(link.anchorVerse)) }}
+            </span>
+            <span v-html="text[link.anchorVerse - 1]" class="text-gray-900" />
+          </div>
+          <LinkResult
+            :index="i + 1"
+            :link="link"
+            @delete="links = links.filter((l) => l._id !== link._id)"
+          />
+        </template>
       </ul>
     </section>
   </Layout>
@@ -64,13 +75,23 @@ import Loader from "./components/Loader.vue";
 import LinkResult from "./components/LinkResult.vue";
 
 const form = reactive({
-  ref: "במדבר א:א",
+  ref: "איוב א",
 });
 
 const loading = ref(false);
+const text = ref<string[]>([]);
 const links = ref<Link[]>([]);
 const kabbalahLinks = computed(() => {
-  return links.value.filter((link) => link.category === "Kabbalah");
+  return links.value
+    .filter(
+      (link) =>
+        link.category === "Kabbalah" &&
+        !/(מגלה עמוקות|ראשית חכמה)/.test(link.collectiveTitle.he)
+    )
+    .sort(
+      (a, b) =>
+        a.anchorVerse - b.anchorVerse || a.commentaryNum - b.commentaryNum
+    );
 });
 // const linkCategories = computed(() => {
 //   return links.value
@@ -78,33 +99,78 @@ const kabbalahLinks = computed(() => {
 //     .filter((value, index, self) => self.indexOf(value) === index);
 // });
 
-const submit = () => {
+const submit = async () => {
   links.value = [];
   loading.value = true;
   const options = { method: "GET", headers: { accept: "application/json" } };
 
-  fetch(
-    `https://www.sefaria.org/api/links/${form.ref}?with_text=1&with_sheet_links=0`,
-    options
-  )
-    .then((response) => response.json())
-    .then((response) => {
-      links.value = response;
-      loading.value = false;
-    })
-    .catch((err) => {
-      loading.value = false;
-      console.error(err);
-    });
+  const [linksResponse, textResponse] = await Promise.all([
+    fetch(
+      `https://www.sefaria.org/api/links/${form.ref}?with_text=1&with_sheet_links=0`,
+      options
+    ),
+    fetch(
+      `https://www.sefaria.org/api/v3/texts/${form.ref}?version=hebrew&fill_in_missing_segments=0&return_format=default`,
+      options
+    ),
+  ]);
+
+  const [linksJson, textJson] = await Promise.all([
+    linksResponse.json(),
+    textResponse.json(),
+  ]);
+
+  const rawText = textJson.versions[0]?.text;
+  text.value = Array.isArray(rawText) ? rawText : [rawText];
+  links.value = linksJson;
+  loading.value = false;
 };
 
 const copyAll = () => {
   const container = document.getElementById("results")!;
-  // get all text from all children
-  const text = Array.from(container.children)
-    .map((child) => child.innerText)
-    .join("\n\n\r ");
-  navigator.clipboard.writeText(text);
-  console.log(text);
+  // copy element styled text to clipboard
+  const range = document.createRange();
+  range.selectNode(container);
+  window.getSelection()!.removeAllRanges();
+  window.getSelection()!.addRange(range);
+  document.execCommand("copy");
 };
+
+function arabicToHebrew(sNumber: string) {
+  var hebrewThousands = [
+    "",
+    "א׳",
+    "ב׳",
+    "ג׳",
+    "ד׳",
+    "ה׳",
+    "ו׳",
+    "ז׳",
+    "ח׳",
+    "ט׳",
+  ];
+  var hebrewHundreds = ["", "ק", "ר", "ש", "ת", "תק", "תר", "תש", "תת", "תתק"];
+  var hebrewTens = ["", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ"];
+  var hebrewUnits = ["", "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט"];
+
+  var numberLength = sNumber.length;
+  var sTens = 0;
+  var sHundreds = 0;
+  var sThousands = 0;
+  var sUnits = sNumber[numberLength - 1];
+  if (+sNumber > 9) sTens = sNumber[numberLength - 2];
+  if (+sNumber > 99) sHundreds = sNumber[numberLength - 3];
+  if (+sNumber > 999) sThousands = sNumber[numberLength - 4];
+  var myHebrewNumber =
+    hebrewThousands[sThousands] +
+    hebrewHundreds[sHundreds] +
+    hebrewTens[sTens] +
+    hebrewUnits[sUnits] +
+    "*";
+  myHebrewNumber = myHebrewNumber.replace("יו*", "טז*");
+  myHebrewNumber = myHebrewNumber.replace("יה*", "טו*");
+  myHebrewNumber = myHebrewNumber.slice(0, myHebrewNumber.length - 1);
+
+  return myHebrewNumber;
+}
 </script>

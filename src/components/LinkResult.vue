@@ -7,7 +7,7 @@
       class="bg-white px-4 rounded-full border flex hover:bg-blue-100 transition-colors items-center absolute -top-3 right-4"
     >
       <span
-        class="bg-pink-600 rounded-full px-2 text-pink-100 me-2 text-sm font-bold"
+        class="bg-pink-600 rounded-full px-2 text-pink-100 me-2 text-sm font-bold select-none"
         >{{ index }}</span
       >
       <button
@@ -34,10 +34,10 @@
     </a>
     <p v-html="link.he" class="mt-4 text-2xl/none font-bold font-siddur" />
     <!-- <pre
-    dir="ltr"
-    class="text-xs p-4 overflow-auto whitespace-pre bg-gray-100"
-    >{{ link }}
-  </pre> -->
+      dir="ltr"
+      class="text-xs p-4 overflow-auto whitespace-pre bg-gray-100"
+      >{{ link }}</pre
+    > -->
     <Loader v-if="loading" />
     <ul v-else class="space-y-6 mt-6">
       <li v-if="translation" class="bg-gray-50 font-bold p-2 relative border">
