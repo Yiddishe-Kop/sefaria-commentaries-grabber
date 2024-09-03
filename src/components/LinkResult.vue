@@ -52,7 +52,7 @@
           v-html="shrinkParenthesis(translation)"
         />
       </li>
-      <li>
+      <li v-if="commentaries.length">
         <p class="text-gray-200">#</p>
       </li>
       <li
@@ -75,7 +75,7 @@
           class="mt-3 text-lg/none text-blue-900 font-siddur"
         />
       </li>
-      <li>
+      <li v-if="commentaries.length">
         <p class="text-gray-200">#</p>
       </li>
     </ul>
