@@ -52,6 +52,9 @@
           v-html="shrinkParenthesis(translation)"
         />
       </li>
+      <li>
+        <p class="text-gray-200">#</p>
+      </li>
       <li
         v-for="commentary in commentaries"
         :key="commentary._id"
@@ -71,6 +74,9 @@
           v-html="shrinkParenthesis(commentary.he)"
           class="mt-3 text-lg/none text-blue-900 font-siddur"
         />
+      </li>
+      <li>
+        <p class="text-gray-200">#</p>
       </li>
     </ul>
   </li>
