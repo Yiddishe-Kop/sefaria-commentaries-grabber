@@ -86,6 +86,7 @@ const kabbalahLinks = computed(() => {
     .filter(
       (link) =>
         link.category === "Kabbalah" &&
+        /(זו?הר|אדרא)/.test(link.collectiveTitle.he) &&
         !/(מגלה עמוקות|ראשית חכמה)/.test(link.collectiveTitle.he)
     )
     .sort(
