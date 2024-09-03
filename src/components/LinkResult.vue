@@ -53,7 +53,7 @@
         />
       </li>
       <li v-if="commentaries.length">
-        <p class="text-gray-200">#</p>
+        <p class="text-gray-200">#@</p>
       </li>
       <li
         v-for="commentary in commentaries"
@@ -76,7 +76,7 @@
         />
       </li>
       <li v-if="commentaries.length">
-        <p class="text-gray-200">#</p>
+        <p class="text-gray-200">#$</p>
       </li>
     </ul>
   </li>
