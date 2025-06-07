@@ -122,7 +122,8 @@ const fetchCommentaries = async () => {
     commentariesResponse.json(),
   ]);
 
-  translation.value = translationJson.versions[0]?.text;
+  translation.value =
+    translationJson.versions.find((v: any) => v.language === "he")?.text || "";
   commentaries.value = commentariesJson.filter(
     (link: Link) => link.category === "Commentary"
   );

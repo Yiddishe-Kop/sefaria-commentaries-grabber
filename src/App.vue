@@ -75,7 +75,7 @@ import Loader from "./components/Loader.vue";
 import LinkResult from "./components/LinkResult.vue";
 
 const form = reactive({
-  ref: "איוב א",
+  ref: "במדבר א",
 });
 
 const loading = ref(false);
